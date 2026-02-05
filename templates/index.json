@@ -245,9 +245,10 @@
         "video_UVwUct": {
           "type": "video",
           "settings": {
+            "video": "shopify://files/videos/06fa3fe146b74e1881cb8d64fd607df3.HD-720p-3.0Mbps-39762510.mp4",
             "video_url": "",
             "description": "Shoppable video",
-            "product": "",
+            "product": "vintage-taco-bell-beanie-copy",
             "button_label": "Buy now"
           }
         }
