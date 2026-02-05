@@ -17,44 +17,94 @@
     }
   }
 
+  .shoppable-video__slider-container-{{ section.id }} {
+    position: relative;
+  }
+
   .shoppable-video__grid-{{ section.id }} {
-    display: flex;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.2rem;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
   }
 
-  .shoppable-video__grid-{{ section.id }}::-webkit-scrollbar {
-    height: 0.4rem;
-  }
-
-  .shoppable-video__grid-{{ section.id }}::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .shoppable-video__grid-{{ section.id }}::-webkit-scrollbar-thumb {
-    background: rgba(var(--color-foreground), 0.2);
-    border-radius: 0.2rem;
-  }
-
-  .shoppable-video__item-{{ section.id }} {
-    flex: 0 0 calc(100% - 1.2rem);
-    scroll-snap-align: start;
-    scroll-behavior: smooth;
-  }
-
-  @media screen and (min-width: 750px) {
+  @media screen and (max-width: 749px) {
     .shoppable-video__grid-{{ section.id }} {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      overflow-x: unset;
-      scroll-snap-type: unset;
+      display: flex;
+      width: 100%;
+      transition: transform 0.3s ease-out;
     }
 
     .shoppable-video__item-{{ section.id }} {
-      flex: unset;
-      scroll-snap-align: unset;
+      flex: 0 0 100%;
+      min-width: 100%;
+    }
+  }
+
+  .shoppable-video__slider-controls-{{ section.id }} {
+    display: none;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .shoppable-video__slider-controls-{{ section.id }} {
+      display: flex;
+    }
+  }
+
+  .shoppable-video__slider-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 0.15rem solid rgba(var(--color-foreground), 0.3);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .shoppable-video__slider-button:hover {
+    border-color: rgba(var(--color-foreground), 0.6);
+    background: rgba(var(--color-foreground), 0.05);
+  }
+
+  .shoppable-video__slider-button:active {
+    background: rgba(var(--color-foreground), 0.1);
+  }
+
+  .shoppable-video__slider-indicators-{{ section.id }} {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .shoppable-video__slider-indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: rgba(var(--color-foreground), 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .shoppable-video__slider-indicator.is-active {
+    background: rgba(var(--color-foreground), 0.8);
+    width: 1.5rem;
+    border-radius: 0.25rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .shoppable-video__slider-controls-{{ section.id }} {
+      display: none !important;
+    }
+
+    .shoppable-video__grid-{{ section.id }} {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
   }
 
@@ -80,141 +130,165 @@
       </div>
     {%- endunless -%}
 
-    <div class="shoppable-video__grid-{{ section.id }}">
-      {%- for block in section.blocks -%}
-        {%- liquid
-          assign video_id = block.settings.video.id | default: block.settings.video_url.id
-          assign video_alt = block.settings.video.alt | default: block.settings.description
-          assign poster = block.settings.video.preview_image | default: block.settings.cover_image
+    <div class="shoppable-video__slider-container-{{ section.id }}" data-shoppable-video-slider>
+      <div class="shoppable-video__grid-{{ section.id }}" data-slider>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign video_id = block.settings.video.id | default: block.settings.video_url.id
+            assign video_alt = block.settings.video.alt | default: block.settings.description
+            assign poster = block.settings.video.preview_image | default: block.settings.cover_image
 
-          if poster != null
-            assign ratio_percent = 1 | divided_by: poster.aspect_ratio | times: 100
-          else
-            assign ratio_percent = 56.25
-          endif
-        -%}
+            if poster != null
+              assign ratio_percent = 1 | divided_by: poster.aspect_ratio | times: 100
+            else
+              assign ratio_percent = 56.25
+            endif
+          -%}
 
-        <div class="shoppable-video__item-{{ section.id }}">
-          <div class="shoppable-video__media-wrapper">
-            <div
-              class="shoppable-video__media media media--transparent ratio global-media-settings"
-              style="--ratio-percent: {{ ratio_percent }}%;"
-            >
-              {%- if block.settings.video != null -%}
-                {{
-                  block.settings.video
-                  | video_tag:
-                    image_size: '1100x',
-                    autoplay: false,
-                    loop: section.settings.enable_video_looping,
-                    muted: true,
-                    controls: false,
-                    playsinline: true
-                }}
-              {%- elsif block.settings.video_url != null -%}
-                {%- if block.settings.video_url.type == 'youtube' -%}
-                  <iframe
-                    src="https://www.youtube.com/embed/{{ video_id }}?controls=0&modestbranding=1&playsinline=1"
-                    allow="autoplay; encrypted-media"
-                    allowfullscreen
-                    title="{{ video_alt | escape }}"
-                  ></iframe>
-                {%- else -%}
-                  <iframe
-                    src="https://player.vimeo.com/video/{{ video_id }}?badge=0"
-                    allow="autoplay; encrypted-media"
-                    allowfullscreen
-                    title="{{ video_alt | escape }}"
-                  ></iframe>
-                {%- endif -%}
-              {%- else -%}
-                {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
-              {%- endif -%}
-            </div>
-
-            <modal-opener data-modal="#ShoppableVideoModal-{{ section.id }}-{{ forloop.index }}">
-              <button
-                class="shoppable-video__overlay-button"
-                type="button"
-                aria-haspopup="dialog"
-                aria-label="{{ 'sections.video.load_video' | t: description: video_alt | escape }}"
-              ></button>
-            </modal-opener>
-          </div>
-        </div>
-
-        <modal-dialog
-          id="ShoppableVideoModal-{{ section.id }}-{{ forloop.index }}"
-          class="modal-video media-modal color-{{ settings.color_schemes | first }}"
-        >
-          <div class="modal-video__content" role="dialog" aria-label="{{ video_alt | escape }}" aria-modal="true" tabindex="-1">
-            <button
-              id="ModalClose-{{ section.id }}-{{ forloop.index }}"
-              type="button"
-              class="modal-video__toggle"
-              aria-label="{{ 'accessibility.close' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-close.svg' | inline_asset_content -}}
-              </span>
-            </button>
-            <div class="modal-video__content-info">
-              <div class="shoppable-video__modal-body">
-                <div class="shoppable-video__modal-media">
-                  <deferred-media class="shoppable-video__modal-video template-popup">
-                    <template>
-                      {%- if block.settings.video != null -%}
-                        {{
-                          block.settings.video
-                          | video_tag:
-                            image_size: '1100x',
-                            autoplay: true,
-                            loop: section.settings.enable_video_looping,
-                            muted: false,
-                            controls: true
-                        }}
-                      {%- elsif block.settings.video_url != null -%}
-                        {%- if block.settings.video_url.type == 'youtube' -%}
-                          <iframe
-                            src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&enablejsapi=1"
-                            class="js-youtube"
-                            allow="autoplay; encrypted-media"
-                            allowfullscreen
-                            title="{{ video_alt | escape }}"
-                          ></iframe>
-                        {%- else -%}
-                          <iframe
-                            src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1"
-                            class="js-vimeo"
-                            allow="autoplay; encrypted-media"
-                            allowfullscreen
-                            title="{{ video_alt | escape }}"
-                          ></iframe>
-                        {%- endif -%}
-                      {%- endif -%}
-                    </template>
-                  </deferred-media>
-                </div>
-
-                <div class="shoppable-video__modal-product">
-                  {%- if block.settings.product != blank -%}
-                    <h3 class="h3">{{ block.settings.product.title }}</h3>
-                    {% render 'price', product: block.settings.product, use_variant: true, show_compare_at_price: true %}
-                    <div class="shoppable-video__modal-cta">
-                      <a class="button button--primary" href="{{ block.settings.product.url }}">
-                        {{- block.settings.button_label | escape -}}
-                      </a>
-                    </div>
+          <div class="shoppable-video__item-{{ section.id }}" data-slider-item>
+            <div class="shoppable-video__media-wrapper">
+              <div
+                class="shoppable-video__media media media--transparent ratio global-media-settings"
+                style="--ratio-percent: {{ ratio_percent }}%;"
+              >
+                {%- if block.settings.video != null -%}
+                  {{
+                    block.settings.video
+                    | video_tag:
+                      image_size: '1100x',
+                      autoplay: false,
+                      loop: section.settings.enable_video_looping,
+                      muted: true,
+                      controls: false,
+                      playsinline: true
+                  }}
+                {%- elsif block.settings.video_url != null -%}
+                  {%- if block.settings.video_url.type == 'youtube' -%}
+                    <iframe
+                      src="https://www.youtube.com/embed/{{ video_id }}?controls=0&modestbranding=1&playsinline=1"
+                      allow="autoplay; encrypted-media"
+                      allowfullscreen
+                      title="{{ video_alt | escape }}"
+                    ></iframe>
                   {%- else -%}
-                    <h3 class="h3">Select a product</h3>
-                    <p class="rte">Choose a product in the block settings to show price and the Buy Now button.</p>
+                    <iframe
+                      src="https://player.vimeo.com/video/{{ video_id }}?badge=0"
+                      allow="autoplay; encrypted-media"
+                      allowfullscreen
+                      title="{{ video_alt | escape }}"
+                    ></iframe>
                   {%- endif -%}
+                {%- else -%}
+                  {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </div>
+
+              <modal-opener data-modal="#ShoppableVideoModal-{{ section.id }}-{{ forloop.index }}">
+                <button
+                  class="shoppable-video__overlay-button"
+                  type="button"
+                  aria-haspopup="dialog"
+                  aria-label="{{ 'sections.video.load_video' | t: description: video_alt | escape }}"
+                ></button>
+              </modal-opener>
+            </div>
+          </div>
+
+          <modal-dialog
+            id="ShoppableVideoModal-{{ section.id }}-{{ forloop.index }}"
+            class="modal-video media-modal color-{{ settings.color_schemes | first }}"
+          >
+            <div class="modal-video__content" role="dialog" aria-label="{{ video_alt | escape }}" aria-modal="true" tabindex="-1">
+              <button
+                id="ModalClose-{{ section.id }}-{{ forloop.index }}"
+                type="button"
+                class="modal-video__toggle"
+                aria-label="{{ 'accessibility.close' | t }}"
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-close.svg' | inline_asset_content -}}
+                </span>
+              </button>
+              <div class="modal-video__content-info">
+                <div class="shoppable-video__modal-body">
+                  <div class="shoppable-video__modal-media">
+                    <deferred-media class="shoppable-video__modal-video template-popup">
+                      <template>
+                        {%- if block.settings.video != null -%}
+                          {{
+                            block.settings.video
+                            | video_tag:
+                              image_size: '1100x',
+                              autoplay: true,
+                              loop: section.settings.enable_video_looping,
+                              muted: false,
+                              controls: true
+                          }}
+                        {%- elsif block.settings.video_url != null -%}
+                          {%- if block.settings.video_url.type == 'youtube' -%}
+                            <iframe
+                              src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&enablejsapi=1"
+                              class="js-youtube"
+                              allow="autoplay; encrypted-media"
+                              allowfullscreen
+                              title="{{ video_alt | escape }}"
+                            ></iframe>
+                          {%- else -%}
+                            <iframe
+                              src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1"
+                              class="js-vimeo"
+                              allow="autoplay; encrypted-media"
+                              allowfullscreen
+                              title="{{ video_alt | escape }}"
+                            ></iframe>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </template>
+                    </deferred-media>
+                  </div>
+
+                  <div class="shoppable-video__modal-product">
+                    {%- if block.settings.product != blank -%}
+                      <h3 class="h3">{{ block.settings.product.title }}</h3>
+                      {% render 'price', product: block.settings.product, use_variant: true, show_compare_at_price: true %}
+                      <div class="shoppable-video__modal-cta">
+                        <a class="button button--primary" href="{{ block.settings.product.url }}">
+                          {{- block.settings.button_label | escape -}}
+                        </a>
+                      </div>
+                    {%- else -%}
+                      <h3 class="h3">Select a product</h3>
+                      <p class="rte">Choose a product in the block settings to show price and the Buy Now button.</p>
+                    {%- endif -%}
+                  </div>
                 </div>
               </div>
             </div>
+          </modal-dialog>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.blocks.size > 1 -%}
+        <div class="shoppable-video__slider-controls-{{ section.id }}">
+          <button class="shoppable-video__slider-button" data-slider-prev aria-label="Previous video">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="shoppable-video__slider-indicators-{{ section.id }}">
+            {%- for block in section.blocks -%}
+              <button class="shoppable-video__slider-indicator{% if forloop.first %} is-active{% endif %}" data-slider-indicator aria-label="Go to slide {{ forloop.index }}"></button>
+            {%- endfor -%}
           </div>
-        </modal-dialog>
-      {%- endfor -%}
+
+          <button class="shoppable-video__slider-button" data-slider-next aria-label="Next video">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
     </div>
   </div>
 </div>
