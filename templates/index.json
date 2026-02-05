@@ -226,6 +226,7 @@
         "video_k3pwpB": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "description": "Shoppable video",
             "product": "mws_apo_1_g2_asshaulers-graphics-kit",
             "button_label": "Buy now"
@@ -234,14 +235,17 @@
         "video_XftEJm": {
           "type": "video",
           "settings": {
+            "video": "shopify://files/videos/06fa3fe146b74e1881cb8d64fd607df3.HD-720p-3.0Mbps-39762510.mp4",
+            "video_url": "",
             "description": "Shoppable video",
-            "product": "",
+            "product": "camo-graphics-kit-for-stark-varg",
             "button_label": "Buy now"
           }
         },
         "video_UVwUct": {
           "type": "video",
           "settings": {
+            "video_url": "",
             "description": "Shoppable video",
             "product": "",
             "button_label": "Buy now"
