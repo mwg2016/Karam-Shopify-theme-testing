@@ -37,6 +37,24 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+  z-index: 1;
+}
+
+.shoppable-video__overlay-button::before {
+  content: '';
+  position: absolute;
+  inset: 50%;
+  width: 4rem;
+  height: 4rem;
+  transform: translate(-50%, -50%);
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>') center no-repeat;
+  background-size: contain;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.shoppable-video__overlay-button:hover::before {
+  opacity: 1;
 }
 
 .shoppable-video__overlay-button:focus-visible {
@@ -48,14 +66,6 @@
   display: grid;
   gap: 2.4rem;
   align-items: start;
-}
-
-.shoppable-video__modal-body--media-right .shoppable-video__modal-media {
-  order: 2;
-}
-
-.shoppable-video__modal-body--media-right .shoppable-video__modal-product {
-  order: 1;
 }
 
 .shoppable-video__modal-media {
