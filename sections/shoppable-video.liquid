@@ -1,0 +1,328 @@
+{{ 'section-shoppable-video.css' | asset_url | stylesheet_tag }}
+{{ 'component-modal-video.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign video_id = section.settings.video.id | default: section.settings.video_url.id
+  assign video_alt = section.settings.video.alt | default: section.settings.description
+  assign poster = section.settings.video.preview_image | default: section.settings.cover_image
+  assign media_position_class = 'shoppable-video__modal-body'
+  if section.settings.media_position == 'right'
+    assign media_position_class = media_position_class | append: ' shoppable-video__modal-body--media-right'
+  endif
+
+  if poster != null
+    assign ratio_percent = 1 | divided_by: poster.aspect_ratio | times: 100
+  else
+    assign ratio_percent = 56.25
+  endif
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="shoppable-video isolate{% unless section.settings.full_width %} page-width{% endunless %} section-{{ section.id }}-padding">
+    {%- unless section.settings.heading == blank -%}
+      <div class="shoppable-video__header">
+        <h2 class="inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          {{ section.settings.heading }}
+        </h2>
+        {%- if section.settings.text != blank -%}
+          <div class="rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+            {{ section.settings.text }}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endunless -%}
+
+    <div class="shoppable-video__media-wrapper">
+      <div
+        class="shoppable-video__media media media--transparent ratio global-media-settings"
+        style="--ratio-percent: {{ ratio_percent }}%;"
+      >
+        {%- if section.settings.video != null -%}
+          {{
+            section.settings.video
+            | video_tag:
+              image_size: '1100x',
+              autoplay: true,
+              loop: section.settings.enable_video_looping,
+              muted: true,
+              controls: false,
+              playsinline: true
+          }}
+        {%- elsif section.settings.video_url != null -%}
+          {%- if section.settings.video_url.type == 'youtube' -%}
+            <iframe
+              src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist={{ video_id }}"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              title="{{ video_alt | escape }}"
+            ></iframe>
+          {%- else -%}
+            <iframe
+              src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1&muted=1&loop=1&background=1"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              title="{{ video_alt | escape }}"
+            ></iframe>
+          {%- endif -%}
+        {%- else -%}
+          {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+
+      <modal-opener data-modal="#ShoppableVideoModal-{{ section.id }}">
+        <button
+          class="shoppable-video__overlay-button"
+          type="button"
+          aria-haspopup="dialog"
+          aria-label="{{ 'sections.video.load_video' | t: description: video_alt | escape }}"
+        ></button>
+      </modal-opener>
+    </div>
+  </div>
+</div>
+
+<modal-dialog
+  id="ShoppableVideoModal-{{ section.id }}"
+  class="modal-video media-modal color-{{ settings.color_schemes | first }}"
+>
+  <div class="modal-video__content" role="dialog" aria-label="{{ video_alt | escape }}" aria-modal="true" tabindex="-1">
+    <button
+      id="ModalClose-{{ section.id }}"
+      type="button"
+      class="modal-video__toggle"
+      aria-label="{{ 'accessibility.close' | t }}"
+    >
+      <span class="svg-wrapper">
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </button>
+    <div class="modal-video__content-info">
+      <div class="{{ media_position_class }}">
+        <div class="shoppable-video__modal-media">
+          <deferred-media class="shoppable-video__modal-video template-popup">
+            <template>
+              {%- if section.settings.video != null -%}
+                {{
+                  section.settings.video
+                  | video_tag:
+                    image_size: '1100x',
+                    autoplay: true,
+                    loop: section.settings.enable_video_looping,
+                    muted: false,
+                    controls: true
+                }}
+              {%- elsif section.settings.video_url != null -%}
+                {%- if section.settings.video_url.type == 'youtube' -%}
+                  <iframe
+                    src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&enablejsapi=1"
+                    class="js-youtube"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen
+                    title="{{ video_alt | escape }}"
+                  ></iframe>
+                {%- else -%}
+                  <iframe
+                    src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1"
+                    class="js-vimeo"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen
+                    title="{{ video_alt | escape }}"
+                  ></iframe>
+                {%- endif -%}
+              {%- endif -%}
+            </template>
+          </deferred-media>
+        </div>
+
+        <div class="shoppable-video__modal-product">
+          {%- if section.settings.product != blank -%}
+            <h3 class="h3">{{ section.settings.product.title }}</h3>
+            {% render 'price', product: section.settings.product, use_variant: true, show_compare_at_price: true %}
+            <div class="shoppable-video__modal-cta">
+              <a class="button button--primary" href="{{ section.settings.product.url }}">
+                {{- section.settings.button_label | escape -}}
+              </a>
+            </div>
+          {%- else -%}
+            <h3 class="h3">Select a product</h3>
+            <p class="rte">Choose a product in the section settings to show price and the Buy Now button.</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</modal-dialog>
+
+{% schema %}
+{
+  "name": "Shoppable video",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Shop the look",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        },
+        {
+          "value": "hxl",
+          "label": "Extra large"
+        },
+        {
+          "value": "hxxl",
+          "label": "Huge"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>Tap the video to shop the featured product.</p>",
+      "label": "Text"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Buy now",
+      "label": "Button label"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Video left"
+        },
+        {
+          "value": "right",
+          "label": "Video right"
+        }
+      ],
+      "default": "left",
+      "label": "Modal layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_looping",
+      "label": "Loop video",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Shopify hosted video"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "default": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+      "label": "YouTube or Vimeo URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover image (optional)"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Video description",
+      "default": "Shoppable video"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shoppable video"
+    }
+  ]
+}
+{% endschema %}

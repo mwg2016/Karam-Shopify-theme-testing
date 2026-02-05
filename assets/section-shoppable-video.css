@@ -1,0 +1,116 @@
+.shoppable-video {
+  position: relative;
+}
+
+.shoppable-video__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.shoppable-video__media-wrapper {
+  position: relative;
+}
+
+.shoppable-video__media {
+  position: relative;
+  border-radius: var(--media-radius);
+  overflow: hidden;
+}
+
+.shoppable-video__media iframe,
+.shoppable-video__media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shoppable-video__media video {
+  object-fit: cover;
+}
+
+.shoppable-video__overlay-button {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.shoppable-video__overlay-button:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.8);
+  outline-offset: -0.2rem;
+}
+
+.shoppable-video__modal-body {
+  display: grid;
+  gap: 2.4rem;
+  align-items: start;
+}
+
+.shoppable-video__modal-body--media-right .shoppable-video__modal-media {
+  order: 2;
+}
+
+.shoppable-video__modal-body--media-right .shoppable-video__modal-product {
+  order: 1;
+}
+
+.shoppable-video__modal-media {
+  position: relative;
+}
+
+.shoppable-video__modal-video {
+  position: relative;
+  border-radius: var(--media-radius);
+  overflow: hidden;
+}
+
+.shoppable-video__modal-video iframe,
+.shoppable-video__modal-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shoppable-video__modal-video video {
+  object-fit: contain;
+}
+
+.shoppable-video__modal-product {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.shoppable-video__modal-product .price {
+  margin-top: 0.4rem;
+}
+
+.shoppable-video__modal-cta {
+  margin-top: 0.8rem;
+}
+
+@media screen and (min-width: 750px) {
+  .shoppable-video__header {
+    margin-bottom: 3rem;
+  }
+
+  .shoppable-video__modal-body {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: 3rem;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .shoppable-video__modal-product {
+    text-align: center;
+  }
+
+  .shoppable-video__modal-cta .button {
+    width: 100%;
+  }
+}
