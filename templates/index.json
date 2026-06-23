@@ -273,7 +273,11 @@
     "sections_tutorial_FGLKra": {
       "type": "sections-tutorial",
       "name": "Sections Tutorial",
-      "settings": {}
+      "settings": {
+        "textarea-inp": "",
+        "select_option": "value_1",
+        "image_picker_inp": "shopify://shop_images/stark_Camo.png"
+      }
     }
   },
   "order": [
