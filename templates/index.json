@@ -269,6 +269,11 @@
         "padding_top": 36,
         "padding_bottom": 36
       }
+    },
+    "sections_tutorial_FGLKra": {
+      "type": "sections-tutorial",
+      "name": "Sections Tutorial",
+      "settings": {}
     }
   },
   "order": [
@@ -278,6 +283,7 @@
     "collage",
     "video",
     "multicolumn",
-    "shoppable_video_QzMjQN"
+    "shoppable_video_QzMjQN",
+    "sections_tutorial_FGLKra"
   ]
 }
