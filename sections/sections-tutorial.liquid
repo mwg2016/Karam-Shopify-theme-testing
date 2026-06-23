@@ -9,6 +9,10 @@
     {{ section.settings.image_picker_inp | image_url: width: 400 | image_tag: style: 'height:200px; object-fit: cover'  }}
 </div>
 
+<div>
+    {{ section.settings.video_select | video_tag: controls: true, style: 'width: 400px' }}
+</div>
+
 {% schema %}
     {
         "name": "section tutorial",
@@ -53,6 +57,11 @@
                 "type": "image_picker",
                 "id": "image_picker_inp",
                 "label": "Select an Image"
+            },
+            {
+                "type": "video",
+                "label": "Select An Video",
+                "id": "video_select"
             }
         ],
         "blocks": [],
