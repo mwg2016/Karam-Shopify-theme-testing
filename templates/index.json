@@ -276,7 +276,8 @@
       "settings": {
         "textarea-inp": "",
         "select_option": "value_1",
-        "image_picker_inp": "shopify://shop_images/stark_Camo.png"
+        "image_picker_inp": "shopify://shop_images/stark_Camo.png",
+        "video_select": "shopify://files/videos/pexels-alena-darmel-8995595 (2160p).mp4"
       }
     }
   },
