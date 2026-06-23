@@ -5,6 +5,10 @@
 <p>{{ section.settings.textarea-inp | newline_to_br }}</p>
 <p>{{ section.settings.select_option }}</p>
 
+<div>
+    {{ section.settings.image_picker_inp | image_url: width: 400 | image_tag  }}
+</div>
+
 {% schema %}
     {
         "name": "section tutorial",
